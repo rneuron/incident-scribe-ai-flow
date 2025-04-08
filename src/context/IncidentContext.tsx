@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Incident, IncidentStatus, IncidentFormData } from '../types/incident';
+import { Incident, IncidentStatus, IncidentFormData, Attachment } from '../types/incident';
 
 interface IncidentContextType {
   incidents: Incident[];
@@ -20,7 +20,7 @@ export const useIncidents = () => {
   return context;
 };
 
-export const IncidentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const IncidentProvider = ({ children }: { children: ReactNode }) => {
   const [incidents, setIncidents] = useState<Incident[]>([
     {
       id: '1',
@@ -67,7 +67,7 @@ export const IncidentProvider: React.FC<{ children: ReactNode }> = ({ children }
   const addIncident = (formData: IncidentFormData): string => {
     const id = Math.random().toString(36).substring(2, 9);
     
-    const attachments = formData.attachments.map((file, index) => ({
+    const attachments: Attachment[] = formData.attachments.map((file, index) => ({
       id: `${id}-${index}`,
       name: file.name,
       url: URL.createObjectURL(file),
