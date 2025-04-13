@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ArrowLeft, Check, Paperclip, Send } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale/es';
+import { es } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 
 const IncidentReview = () => {
