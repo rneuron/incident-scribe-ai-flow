@@ -25,7 +25,11 @@ const CreateIncident = () => {
       departureAirport: '',
       incident: '',
       investigation: '',
-      attachments: []
+      attachments: [],
+      eventNumber: '',
+      baseIATA: '',
+      registration: '',
+      flightNumber: ''
     }
   });
 
@@ -41,8 +45,8 @@ const CreateIncident = () => {
         
         if (!isValid) {
           toast({
-            title: "Invalid file type",
-            description: "Only images, PDFs, and documents are allowed",
+            title: "Tipo de archivo inválido",
+            description: "Solo se permiten imágenes, PDFs y documentos",
             variant: "destructive"
           });
         }
@@ -67,8 +71,8 @@ const CreateIncident = () => {
     const incidentId = addIncident(formData);
     
     toast({
-      title: "Incident Created",
-      description: "Your incident report has been created successfully"
+      title: "Incidente Creado",
+      description: "Su reporte de incidente ha sido creado exitosamente"
     });
     
     navigate(`/review-incident/${incidentId}`);
@@ -85,7 +89,7 @@ const CreateIncident = () => {
           <Button variant="outline" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Create New Incident Report</h1>
+          <h1 className="text-3xl font-bold">Crear Nuevo Reporte de Incidente</h1>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
@@ -97,7 +101,7 @@ const CreateIncident = () => {
                   name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Incident</FormLabel>
+                      <FormLabel>Fecha del Incidente</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -108,12 +112,68 @@ const CreateIncident = () => {
                 
                 <FormField
                   control={form.control}
+                  name="eventNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Evento</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ingrese número de evento" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="airline"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Airline</FormLabel>
+                      <FormLabel>Aerolínea</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter airline name" {...field} />
+                        <Input placeholder="Ingrese nombre de aerolínea" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="baseIATA"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Base (siglas IATA)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej. BOG, MEX, LIM" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="registration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Matrícula</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ingrese matrícula de la aeronave" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="flightNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Vuelo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej. LA2456" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -125,9 +185,9 @@ const CreateIncident = () => {
                   name="departureAirport"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Departure Airport</FormLabel>
+                      <FormLabel>Aeropuerto de Salida</FormLabel>
                       <FormControl>
-                        <Input placeholder="Airport code (e.g., JFK)" {...field} />
+                        <Input placeholder="Código de aeropuerto (ej. JFK)" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -139,9 +199,9 @@ const CreateIncident = () => {
                   name="arrivingAirport"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Arriving Airport</FormLabel>
+                      <FormLabel>Aeropuerto de Llegada</FormLabel>
                       <FormControl>
-                        <Input placeholder="Airport code (e.g., LAX)" {...field} />
+                        <Input placeholder="Código de aeropuerto (ej. LAX)" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -154,10 +214,10 @@ const CreateIncident = () => {
                 name="incident"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Incident Description</FormLabel>
+                    <FormLabel>Descripción del Incidente</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Provide a detailed description of the incident" 
+                        placeholder="Proporcione una descripción detallada del incidente" 
                         className="min-h-[100px]" 
                         {...field} 
                       />
@@ -172,10 +232,10 @@ const CreateIncident = () => {
                 name="investigation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Investigation Notes</FormLabel>
+                    <FormLabel>Notas de Investigación</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter initial investigation findings" 
+                        placeholder="Ingrese hallazgos iniciales de la investigación" 
                         className="min-h-[150px]" 
                         {...field} 
                       />
@@ -186,7 +246,7 @@ const CreateIncident = () => {
               />
 
               <div className="space-y-4">
-                <Label>Attachments (Images, PDFs, Documents)</Label>
+                <Label>Adjuntos (Imágenes, PDFs, Documentos)</Label>
                 
                 <div className="flex items-center gap-4">
                   <Button
@@ -196,7 +256,7 @@ const CreateIncident = () => {
                     onClick={() => document.getElementById('file-upload')?.click()}
                   >
                     <Upload className="mr-2 h-4 w-4" />
-                    Add Files
+                    Agregar Archivos
                     <input
                       id="file-upload"
                       type="file"
@@ -207,13 +267,13 @@ const CreateIncident = () => {
                     />
                   </Button>
                   <p className="text-sm text-muted-foreground">
-                    Supported file types: Images, PDFs, Word documents
+                    Formatos soportados: Imágenes, PDFs, documentos Word
                   </p>
                 </div>
 
                 {files.length > 0 && (
                   <div className="border rounded-md p-4">
-                    <p className="text-sm font-medium mb-2">Attached Files ({files.length})</p>
+                    <p className="text-sm font-medium mb-2">Archivos Adjuntos ({files.length})</p>
                     <div className="space-y-2">
                       {files.map((file, index) => (
                         <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
@@ -238,10 +298,10 @@ const CreateIncident = () => {
 
               <div className="flex justify-between pt-4">
                 <Button type="button" variant="outline" onClick={handleBack}>
-                  Back
+                  Volver
                 </Button>
                 <Button type="submit">
-                  Proceed to Review
+                  Proceder a Revisión
                 </Button>
               </div>
             </form>

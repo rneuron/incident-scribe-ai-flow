@@ -19,6 +19,10 @@ export interface Incident {
   attachments: Attachment[];
   status: IncidentStatus;
   createdAt: string;
+  eventNumber?: string;
+  baseIATA?: string;
+  registration?: string;
+  flightNumber?: string;
 }
 
 export interface IncidentFormData {
@@ -29,4 +33,8 @@ export interface IncidentFormData {
   incident: string;
   investigation: string;
   attachments: File[];
+  eventNumber: string;
+  baseIATA: string;
+  registration: string;
+  flightNumber: string;
 }

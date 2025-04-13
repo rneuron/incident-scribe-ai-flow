@@ -25,16 +25,20 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
     {
       id: '1',
       date: '2025-04-08',
-      airline: 'Example Airlines',
+      airline: 'Aerolíneas Ejemplo',
       arrivingAirport: 'LAX',
       departureAirport: 'JFK',
-      incident: 'Flight delay due to mechanical issues',
-      investigation: 'Initial inspection revealed fuel system problem',
+      incident: 'Retraso de vuelo debido a problemas mecánicos',
+      investigation: 'La inspección inicial reveló un problema en el sistema de combustible',
       attachments: [
-        { id: '1', name: 'report.pdf', url: '#', type: 'pdf' }
+        { id: '1', name: 'informe.pdf', url: '#', type: 'pdf' }
       ],
       status: 'preliminary',
-      createdAt: '2025-04-07'
+      createdAt: '2025-04-07',
+      eventNumber: 'EV-2025-042',
+      baseIATA: 'JFK',
+      registration: 'N12345',
+      flightNumber: 'AE789'
     },
     {
       id: '2',
@@ -42,11 +46,15 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
       airline: 'Sky Express',
       arrivingAirport: 'ORD',
       departureAirport: 'ATL',
-      incident: 'Cargo loading issue',
-      investigation: 'Weight distribution error in loading manifest',
+      incident: 'Problema de carga',
+      investigation: 'Error de distribución de peso en el manifiesto de carga',
       attachments: [],
       status: 'draft',
-      createdAt: '2025-04-06'
+      createdAt: '2025-04-06',
+      eventNumber: 'EV-2025-041',
+      baseIATA: 'ATL',
+      registration: 'N54321',
+      flightNumber: 'SE456'
     },
     {
       id: '3',
@@ -54,13 +62,17 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
       airline: 'Global Air',
       arrivingAirport: 'DFW',
       departureAirport: 'SFO',
-      incident: 'Minor turbulence injury',
-      investigation: 'Passenger did not have seatbelt fastened',
+      incident: 'Lesión menor por turbulencia',
+      investigation: 'El pasajero no tenía el cinturón de seguridad abrochado',
       attachments: [
-        { id: '2', name: 'injury-report.pdf', url: '#', type: 'pdf' }
+        { id: '2', name: 'informe-lesion.pdf', url: '#', type: 'pdf' }
       ],
       status: 'done',
-      createdAt: '2025-04-05'
+      createdAt: '2025-04-05',
+      eventNumber: 'EV-2025-040',
+      baseIATA: 'SFO',
+      registration: 'N98765',
+      flightNumber: 'GA123'
     }
   ]);
 

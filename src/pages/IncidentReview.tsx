@@ -100,14 +100,38 @@ const IncidentReview = () => {
             </h2>
             
             <div className="space-y-6 flex-grow">
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Fecha del Incidente</p>
-                <p className="font-medium text-slate-800">{formatDate(incident.date)}</p>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Fecha del Incidente</p>
+                  <p className="font-medium text-slate-800">{formatDate(incident.date)}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Número de Evento</p>
+                  <p className="font-medium text-slate-800">{incident.eventNumber || '-'}</p>
+                </div>
               </div>
               
               <div>
                 <p className="text-sm text-slate-500 mb-1">Aerolínea</p>
                 <p className="font-medium text-slate-800">{incident.airline}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Base IATA</p>
+                  <p className="font-medium text-slate-800">{incident.baseIATA || '-'}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Matrícula</p>
+                  <p className="font-medium text-slate-800">{incident.registration || '-'}</p>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Número de Vuelo</p>
+                <p className="font-medium text-slate-800">{incident.flightNumber || '-'}</p>
               </div>
               
               <div className="grid grid-cols-2 gap-6">
