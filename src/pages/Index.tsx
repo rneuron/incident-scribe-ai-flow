@@ -13,10 +13,10 @@ const Index = () => {
           <ClipboardList className="h-10 w-10 text-blue-600" />
         </div>
         
-        <h1 className="text-4xl font-bold mb-4 text-slate-800">Aviation Incident Reporting System</h1>
+        <h1 className="text-4xl font-bold mb-4 text-slate-800">Sistema de Reporte de Incidentes de Aviación</h1>
         <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
-          Streamline your incident documentation process with our AI-powered reporting system.
-          Create, manage, and review aviation incidents with ease.
+          Simplifique su proceso de documentación de incidentes con nuestro sistema de informes potenciado por IA.
+          Cree, gestione y revise incidentes de aviación con facilidad.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -25,7 +25,7 @@ const Index = () => {
             size="lg"
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Create New Incident
+            Crear Nuevo Incidente
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           
@@ -35,7 +35,7 @@ const Index = () => {
             variant="outline"
             className="border-blue-200 text-blue-600 hover:bg-blue-50"
           >
-            View All Incidents
+            Ver Todos los Incidentes
           </Button>
         </div>
       </div>

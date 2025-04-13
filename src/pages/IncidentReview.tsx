@@ -4,10 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Check, Paperclip, Send } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import { IncidentStatus } from '@/types/incident';
 
 const IncidentReview = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,17 +23,21 @@ const IncidentReview = () => {
 
   if (!incident) {
     return (
-      <div className="container mx-auto py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Incident Not Found</h1>
-        <p className="mb-6">The incident report you're looking for doesn't exist or has been removed.</p>
-        <Button onClick={() => navigate('/')}>Return to Incidents</Button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="text-center px-4">
+          <h1 className="text-2xl font-bold mb-4 text-slate-800">Incidente No Encontrado</h1>
+          <p className="mb-6 text-slate-600">El reporte de incidente que está buscando no existe o ha sido eliminado.</p>
+          <Button onClick={() => navigate('/')} className="bg-blue-600 hover:bg-blue-700 text-white">
+            Volver a Incidentes
+          </Button>
+        </div>
       </div>
     );
   }
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMMM d, yyyy');
+      return format(new Date(dateString), 'd MMMM yyyy');
     } catch (error) {
       return dateString;
     }
@@ -45,149 +51,177 @@ const IncidentReview = () => {
     
     // Simulate AI response
     setTimeout(() => {
-      const aiResponse = `I've updated the report based on your request: "${feedback}"`;
+      const aiResponse = `He actualizado el reporte según su solicitud: "${feedback}"`;
       setChatHistory(prev => [...prev, { role: 'ai', content: aiResponse }]);
       
       // Update the report with the feedback
-      updateIncidentReport(id!, `${incident.investigation}\n\nUpdate (${new Date().toLocaleTimeString()}): ${feedback}`);
+      updateIncidentReport(id!, `${incident.investigation}\n\nActualización (${new Date().toLocaleTimeString()}): ${feedback}`);
       
       // Clear the feedback input
       setFeedback('');
     }, 1000);
   };
 
-  const handleComplete = () => {
-    updateIncidentStatus(id!, 'done');
+  const handleStatusChange = (status: IncidentStatus) => {
+    updateIncidentStatus(id!, status);
+    
+    const statusLabels: Record<IncidentStatus, string> = {
+      'draft': 'borrador',
+      'preliminary': 'preliminar',
+      'done': 'completado',
+      'sent to client': 'enviado al cliente'
+    };
     
     toast({
-      title: "Report Completed",
-      description: "The incident report has been marked as done."
+      title: "Estado Actualizado",
+      description: `El reporte ha sido marcado como ${statusLabels[status]}.`
     });
     
-    navigate('/');
+    if (status === 'done' || status === 'sent to client') {
+      navigate('/');
+    }
   };
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      <div className="flex items-center space-x-4 mb-6">
-        <Button variant="outline" size="icon" onClick={() => navigate('/')}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <h1 className="text-2xl font-bold">Incident Report Review</h1>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-8rem)]">
+        <div className="flex items-center space-x-4 mb-8">
+          <Button variant="outline" size="icon" onClick={() => navigate('/')} className="rounded-full shadow-sm">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold text-slate-800">Revisión de Reporte de Incidente</h1>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Incident Details */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Incident Details</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Date of Incident</p>
-              <p className="font-medium">{formatDate(incident.date)}</p>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+          {/* Left Column - Incident Details */}
+          <div className="bg-slate-100 rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col h-full overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800 pb-3 border-b border-slate-200">
+              Detalles del Incidente
+            </h2>
             
-            <div>
-              <p className="text-sm text-muted-foreground">Airline</p>
-              <p className="font-medium">{incident.airline}</p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6 flex-grow">
               <div>
-                <p className="text-sm text-muted-foreground">Departure</p>
-                <p className="font-medium">{incident.departureAirport}</p>
+                <p className="text-sm text-slate-500 mb-1">Fecha del Incidente</p>
+                <p className="font-medium text-slate-800">{formatDate(incident.date)}</p>
               </div>
               
               <div>
-                <p className="text-sm text-muted-foreground">Arrival</p>
-                <p className="font-medium">{incident.arrivingAirport}</p>
+                <p className="text-sm text-slate-500 mb-1">Aerolínea</p>
+                <p className="font-medium text-slate-800">{incident.airline}</p>
               </div>
+              
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Salida</p>
+                  <p className="font-medium text-slate-800">{incident.departureAirport}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Llegada</p>
+                  <p className="font-medium text-slate-800">{incident.arrivingAirport}</p>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Descripción del Incidente</p>
+                <p className="mt-1 text-slate-700">{incident.incident}</p>
+              </div>
+
+              {incident.attachments.length > 0 && (
+                <div>
+                  <p className="text-sm text-slate-500 mb-2">Adjuntos</p>
+                  <div className="space-y-2">
+                    {incident.attachments.map((attachment) => (
+                      <div 
+                        key={attachment.id} 
+                        className="flex items-center p-3 bg-white rounded-lg cursor-pointer hover:bg-slate-50 border border-slate-200 transition-colors"
+                        onClick={() => setShowAttachment(attachment.url)}
+                      >
+                        <Paperclip className="h-4 w-4 mr-2 text-blue-500" />
+                        <span className="text-sm text-slate-700">{attachment.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Middle Column - Report Content */}
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex flex-col h-full lg:col-span-1 overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800 pb-3 border-b border-slate-100">
+              Reporte Generado
+            </h2>
+            <div className="prose prose-sm max-w-none bg-slate-50 p-5 rounded-lg border border-slate-100 flex-grow">
+              <p className="whitespace-pre-line">{incident.investigation}</p>
+            </div>
+          </div>
+
+          {/* Right Column - AI Chat */}
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex flex-col h-full overflow-hidden">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800 pb-3 border-b border-slate-100">
+              Asistente IA
+            </h2>
+            
+            <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+              {chatHistory.length === 0 ? (
+                <div className="text-center py-8 text-slate-400">
+                  <p>Pida al asistente IA que le ayude a mejorar su reporte o hacer cambios en el contenido.</p>
+                </div>
+              ) : (
+                chatHistory.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`p-3 rounded-lg ${
+                      message.role === 'user' 
+                        ? 'bg-blue-50 ml-4 border border-blue-100' 
+                        : 'bg-slate-50 mr-4 border border-slate-100'
+                    }`}
+                  >
+                    <p className="text-sm">
+                      {message.content}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
             
-            <div>
-              <p className="text-sm text-muted-foreground">Incident Description</p>
-              <p className="mt-1">{incident.incident}</p>
+            <div className="flex gap-2">
+              <Textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Escriba sus comentarios o preguntas aquí..."
+                className="min-h-[80px] resize-none"
+              />
+              <Button 
+                className="self-end" 
+                size="icon" 
+                onClick={handleSendFeedback}
+                disabled={!feedback.trim()}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
 
-            {incident.attachments.length > 0 && (
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Attachments</p>
-                <div className="space-y-2">
-                  {incident.attachments.map((attachment) => (
-                    <div 
-                      key={attachment.id} 
-                      className="flex items-center p-2 bg-muted rounded-md cursor-pointer hover:bg-muted/80"
-                      onClick={() => setShowAttachment(attachment.url)}
-                    >
-                      <Paperclip className="h-4 w-4 mr-2" />
-                      <span className="text-sm">{attachment.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="mt-4 flex items-center">
+              <Select
+                onValueChange={handleStatusChange}
+                defaultValue={incident.status}
+              >
+                <SelectTrigger className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">
+                  <Check className="mr-2 h-4 w-4" />
+                  <span>Marcar como:</span>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Borrador</SelectItem>
+                  <SelectItem value="preliminary">Preliminar</SelectItem>
+                  <SelectItem value="done">Completado</SelectItem>
+                  <SelectItem value="sent to client">Enviado al Cliente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
-
-        {/* Middle Column - Report Content */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Generated Report</h2>
-          <div className="prose prose-sm max-w-none">
-            <p className="whitespace-pre-line">{incident.investigation}</p>
-          </div>
-        </div>
-
-        {/* Right Column - AI Chat */}
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col">
-          <h2 className="text-xl font-semibold mb-4">AI Assistant</h2>
-          
-          <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-            {chatHistory.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Ask the AI to help improve your report or make changes to the content.</p>
-              </div>
-            ) : (
-              chatHistory.map((message, index) => (
-                <div 
-                  key={index} 
-                  className={`p-3 rounded-lg ${
-                    message.role === 'user' 
-                      ? 'bg-primary/10 ml-4' 
-                      : 'bg-muted mr-4'
-                  }`}
-                >
-                  <p className="text-sm">
-                    {message.content}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-          
-          <div className="flex gap-2">
-            <Textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Type your feedback or questions here..."
-              className="min-h-[80px] resize-none"
-            />
-            <Button 
-              className="self-end" 
-              size="icon" 
-              onClick={handleSendFeedback}
-              disabled={!feedback.trim()}
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Button 
-            className="mt-4 w-full" 
-            onClick={handleComplete}
-          >
-            <Check className="mr-2 h-4 w-4" />
-            Mark as Done
-          </Button>
         </div>
       </div>
 
@@ -195,7 +229,7 @@ const IncidentReview = () => {
       <Dialog open={!!showAttachment} onOpenChange={() => setShowAttachment(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Attachment Preview</DialogTitle>
+            <DialogTitle>Vista Previa del Adjunto</DialogTitle>
           </DialogHeader>
           {showAttachment && (
             showAttachment.includes('pdf') ? (
@@ -203,14 +237,14 @@ const IncidentReview = () => {
                 <iframe 
                   src={showAttachment} 
                   className="w-full h-full" 
-                  title="PDF Preview"
+                  title="Vista Previa PDF"
                 />
               </div>
             ) : (
               <div className="flex justify-center">
                 <img 
                   src={showAttachment} 
-                  alt="Attachment" 
+                  alt="Adjunto" 
                   className="max-h-[70vh] object-contain"
                 />
               </div>
