@@ -4,17 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, FileText, Calendar, Plane, MapPin } from 'lucide-react';
+import { Plus, FileText, Calendar, Plane, MapPin, PenLine } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { IncidentStatus } from '@/types/incident';
 import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const IncidentList = () => {
   const { incidents, updateIncidentStatus } = useIncidents();
   const navigate = useNavigate();
 
   const handleCreateNew = () => {
-    navigate('/create-incident');
+    navigate('/crear-incidente');
   };
 
   const handleStatusChange = (id: string, status: IncidentStatus) => {
@@ -23,7 +24,7 @@ const IncidentList = () => {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM dd, yyyy');
+      return format(new Date(dateString), 'dd MMM, yyyy', { locale: es });
     } catch (error) {
       return dateString;
     }
@@ -39,17 +40,27 @@ const IncidentList = () => {
     }
   };
 
+  const translateStatus = (status: IncidentStatus): string => {
+    switch (status) {
+      case 'draft': return 'Borrador';
+      case 'preliminary': return 'Preliminar';
+      case 'done': return 'Finalizado';
+      case 'sent to client': return 'Enviado al Cliente';
+      default: return status;
+    }
+  };
+
   return (
     <div className="page-container py-12 px-6">
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-bold text-slate-800">Incident Reports</h1>
+        <h1 className="text-3xl font-bold text-slate-800">Reportes de Incidentes</h1>
         <Button 
           onClick={handleCreateNew} 
           className="bg-blue-600 hover:bg-blue-700 text-white"
           size="lg"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Create New Incident
+          Crear Nuevo Incidente
         </Button>
       </div>
 
@@ -57,20 +68,20 @@ const IncidentList = () => {
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="py-4"><Calendar className="h-4 w-4 inline mr-2" /> Date</TableHead>
-              <TableHead><Plane className="h-4 w-4 inline mr-2" /> Airline</TableHead>
-              <TableHead><MapPin className="h-4 w-4 inline mr-2" /> Departure</TableHead>
-              <TableHead><MapPin className="h-4 w-4 inline mr-2" /> Arrival</TableHead>
-              <TableHead><FileText className="h-4 w-4 inline mr-2" /> Incident</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="py-4 whitespace-nowrap"><Calendar className="h-4 w-4 inline mr-2" /> Fecha</TableHead>
+              <TableHead className="whitespace-nowrap"><Plane className="h-4 w-4 inline mr-2" /> Aerolínea</TableHead>
+              <TableHead className="whitespace-nowrap"><MapPin className="h-4 w-4 inline mr-2" /> Salida</TableHead>
+              <TableHead className="whitespace-nowrap"><MapPin className="h-4 w-4 inline mr-2" /> Llegada</TableHead>
+              <TableHead className="whitespace-nowrap"><FileText className="h-4 w-4 inline mr-2" /> Incidente</TableHead>
+              <TableHead className="whitespace-nowrap">Estado</TableHead>
+              <TableHead className="text-right whitespace-nowrap">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {incidents.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-12 text-slate-500">
-                  No incidents found. Create your first incident report.
+                  No se encontraron incidentes. Cree su primer reporte de incidente.
                 </TableCell>
               </TableRow>
             ) : (
@@ -97,10 +108,10 @@ const IncidentList = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="preliminary">Preliminary</SelectItem>
-                          <SelectItem value="done">Done</SelectItem>
-                          <SelectItem value="sent to client">Sent to Client</SelectItem>
+                          <SelectItem value="draft">Borrador</SelectItem>
+                          <SelectItem value="preliminary">Preliminar</SelectItem>
+                          <SelectItem value="done">Finalizado</SelectItem>
+                          <SelectItem value="sent to client">Enviado al Cliente</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -109,10 +120,11 @@ const IncidentList = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => navigate(`/review-incident/${incident.id}`)}
+                      onClick={() => navigate(`/revisar-incidente/${incident.id}`)}
                       className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                     >
-                      View Details
+                      <PenLine className="h-4 w-4 mr-1" />
+                      Editar Reporte
                     </Button>
                   </TableCell>
                 </TableRow>
