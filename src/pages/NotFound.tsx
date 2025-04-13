@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const NotFound = () => {
   const location = useLocation();
@@ -23,14 +24,13 @@ const NotFound = () => {
         <h1 className="text-3xl font-bold mb-4 text-slate-800">Página No Encontrada</h1>
         <p className="text-lg text-slate-600 mb-8">¡Ups! La página que está buscando no existe o ha sido movida.</p>
         <Button 
-          href="/" 
           className="bg-blue-600 hover:bg-blue-700 text-white"
           asChild
         >
-          <a>
+          <Link to="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver al Inicio
-          </a>
+          </Link>
         </Button>
       </div>
     </div>
