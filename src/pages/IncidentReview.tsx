@@ -69,156 +69,158 @@ const IncidentReview = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      <div className="flex items-center space-x-4 mb-6">
-        <Button variant="outline" size="icon" onClick={() => navigate('/')}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <h1 className="text-2xl font-bold">Revisión de Reporte de Incidente</h1>
-      </div>
+    <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center space-x-4 mb-8">
+          <Button variant="outline" size="icon" onClick={() => navigate('/')} className="rounded-full shadow-sm">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold text-slate-800">Revisión de Reporte de Incidente</h1>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Incident Details */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Detalles del Incidente</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Fecha del Incidente</p>
-              <p className="font-medium">{formatDate(incident.date)}</p>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Incident Details */}
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800 pb-3 border-b border-slate-100">Detalles del Incidente</h2>
             
-            <div>
-              <p className="text-sm text-muted-foreground">Aerolínea</p>
-              <p className="font-medium">{incident.airline}</p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
               <div>
-                <p className="text-sm text-muted-foreground">Salida</p>
-                <p className="font-medium">{incident.departureAirport}</p>
+                <p className="text-sm text-slate-500 mb-1">Fecha del Incidente</p>
+                <p className="font-medium text-slate-800">{formatDate(incident.date)}</p>
               </div>
               
               <div>
-                <p className="text-sm text-muted-foreground">Llegada</p>
-                <p className="font-medium">{incident.arrivingAirport}</p>
+                <p className="text-sm text-slate-500 mb-1">Aerolínea</p>
+                <p className="font-medium text-slate-800">{incident.airline}</p>
               </div>
+              
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Salida</p>
+                  <p className="font-medium text-slate-800">{incident.departureAirport}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Llegada</p>
+                  <p className="font-medium text-slate-800">{incident.arrivingAirport}</p>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Descripción del Incidente</p>
+                <p className="mt-1 text-slate-700">{incident.incident}</p>
+              </div>
+
+              {incident.attachments.length > 0 && (
+                <div>
+                  <p className="text-sm text-slate-500 mb-2">Adjuntos</p>
+                  <div className="space-y-2">
+                    {incident.attachments.map((attachment) => (
+                      <div 
+                        key={attachment.id} 
+                        className="flex items-center p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 border border-slate-100 transition-colors"
+                        onClick={() => setShowAttachment(attachment.url)}
+                      >
+                        <Paperclip className="h-4 w-4 mr-2 text-blue-500" />
+                        <span className="text-sm text-slate-700">{attachment.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Middle Column - Report Content */}
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800 pb-3 border-b border-slate-100">Reporte Generado</h2>
+            <div className="prose prose-sm max-w-none text-slate-700">
+              <p className="whitespace-pre-line">{incident.investigation}</p>
+            </div>
+          </div>
+
+          {/* Right Column - AI Chat */}
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex flex-col">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800 pb-3 border-b border-slate-100">Asistente IA</h2>
+            
+            <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-[350px]">
+              {chatHistory.length === 0 ? (
+                <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-lg">
+                  <p>Pídale a la IA que le ayude a mejorar su reporte o hacer cambios en el contenido.</p>
+                </div>
+              ) : (
+                chatHistory.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`p-4 rounded-lg ${
+                      message.role === 'user' 
+                        ? 'bg-blue-50 text-slate-800 ml-4 border border-blue-100' 
+                        : 'bg-slate-50 text-slate-700 mr-4 border border-slate-100'
+                    }`}
+                  >
+                    <p className="text-sm">
+                      {message.content}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
             
-            <div>
-              <p className="text-sm text-muted-foreground">Descripción del Incidente</p>
-              <p className="mt-1">{incident.incident}</p>
+            <div className="flex gap-2">
+              <Textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Escriba sus comentarios o preguntas aquí..."
+                className="min-h-[80px] resize-none rounded-lg border-slate-200"
+              />
+              <Button 
+                className="self-end bg-blue-600 hover:bg-blue-700 text-white" 
+                size="icon" 
+                onClick={handleSendFeedback}
+                disabled={!feedback.trim()}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
 
-            {incident.attachments.length > 0 && (
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Adjuntos</p>
-                <div className="space-y-2">
-                  {incident.attachments.map((attachment) => (
-                    <div 
-                      key={attachment.id} 
-                      className="flex items-center p-2 bg-muted rounded-md cursor-pointer hover:bg-muted/80"
-                      onClick={() => setShowAttachment(attachment.url)}
-                    >
-                      <Paperclip className="h-4 w-4 mr-2" />
-                      <span className="text-sm">{attachment.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Middle Column - Report Content */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Reporte Generado</h2>
-          <div className="prose prose-sm max-w-none">
-            <p className="whitespace-pre-line">{incident.investigation}</p>
-          </div>
-        </div>
-
-        {/* Right Column - AI Chat */}
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col">
-          <h2 className="text-xl font-semibold mb-4">Asistente IA</h2>
-          
-          <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-            {chatHistory.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Pídale a la IA que le ayude a mejorar su reporte o hacer cambios en el contenido.</p>
-              </div>
-            ) : (
-              chatHistory.map((message, index) => (
-                <div 
-                  key={index} 
-                  className={`p-3 rounded-lg ${
-                    message.role === 'user' 
-                      ? 'bg-primary/10 ml-4' 
-                      : 'bg-muted mr-4'
-                  }`}
-                >
-                  <p className="text-sm">
-                    {message.content}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-          
-          <div className="flex gap-2">
-            <Textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Escriba sus comentarios o preguntas aquí..."
-              className="min-h-[80px] resize-none"
-            />
             <Button 
-              className="self-end" 
-              size="icon" 
-              onClick={handleSendFeedback}
-              disabled={!feedback.trim()}
+              className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white" 
+              onClick={handleComplete}
             >
-              <Send className="h-4 w-4" />
+              <Check className="mr-2 h-4 w-4" />
+              Marcar como Finalizado
             </Button>
           </div>
-
-          <Button 
-            className="mt-4 w-full" 
-            onClick={handleComplete}
-          >
-            <Check className="mr-2 h-4 w-4" />
-            Marcar como Finalizado
-          </Button>
         </div>
-      </div>
 
-      {/* Attachment Preview Dialog */}
-      <Dialog open={!!showAttachment} onOpenChange={() => setShowAttachment(null)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Vista Previa del Adjunto</DialogTitle>
-          </DialogHeader>
-          {showAttachment && (
-            showAttachment.includes('pdf') ? (
-              <div className="h-[70vh]">
-                <iframe 
-                  src={showAttachment} 
-                  className="w-full h-full" 
-                  title="Vista previa de PDF"
-                />
-              </div>
-            ) : (
-              <div className="flex justify-center">
-                <img 
-                  src={showAttachment} 
-                  alt="Adjunto" 
-                  className="max-h-[70vh] object-contain"
-                />
-              </div>
-            )
-          )}
-        </DialogContent>
-      </Dialog>
+        {/* Attachment Preview Dialog */}
+        <Dialog open={!!showAttachment} onOpenChange={() => setShowAttachment(null)}>
+          <DialogContent className="max-w-4xl bg-white rounded-xl">
+            <DialogHeader>
+              <DialogTitle>Vista Previa del Adjunto</DialogTitle>
+            </DialogHeader>
+            {showAttachment && (
+              showAttachment.includes('pdf') ? (
+                <div className="h-[70vh]">
+                  <iframe 
+                    src={showAttachment} 
+                    className="w-full h-full rounded-lg border border-slate-200" 
+                    title="Vista previa de PDF"
+                  />
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <img 
+                    src={showAttachment} 
+                    alt="Adjunto" 
+                    className="max-h-[70vh] object-contain rounded-lg border border-slate-100"
+                  />
+                </div>
+              )
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };
