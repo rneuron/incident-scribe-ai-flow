@@ -21,9 +21,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<IncidentList />} />
-            <Route path="/bienvenida" element={<Index />} />
-            <Route path="/crear-incidente" element={<CreateIncident />} />
-            <Route path="/revisar-incidente/:id" element={<IncidentReview />} />
+            <Route path="/welcome" element={<Index />} />
+            <Route path="/create-incident" element={<CreateIncident />} />
+            <Route path="/review-incident/:id" element={<IncidentReview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

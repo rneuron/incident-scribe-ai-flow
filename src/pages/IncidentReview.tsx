@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ArrowLeft, Check, Paperclip, Send } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 
 const IncidentReview = () => {
@@ -23,16 +22,16 @@ const IncidentReview = () => {
   if (!incident) {
     return (
       <div className="container mx-auto py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Incidente No Encontrado</h1>
-        <p className="mb-6">El reporte de incidente que está buscando no existe o ha sido eliminado.</p>
-        <Button onClick={() => navigate('/')}>Volver a Incidentes</Button>
+        <h1 className="text-2xl font-bold mb-4">Incident Not Found</h1>
+        <p className="mb-6">The incident report you're looking for doesn't exist or has been removed.</p>
+        <Button onClick={() => navigate('/')}>Return to Incidents</Button>
       </div>
     );
   }
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'd MMMM, yyyy', { locale: es });
+      return format(new Date(dateString), 'MMMM d, yyyy');
     } catch (error) {
       return dateString;
     }
@@ -46,11 +45,11 @@ const IncidentReview = () => {
     
     // Simulate AI response
     setTimeout(() => {
-      const aiResponse = `He actualizado el reporte según su solicitud: "${feedback}"`;
+      const aiResponse = `I've updated the report based on your request: "${feedback}"`;
       setChatHistory(prev => [...prev, { role: 'ai', content: aiResponse }]);
       
       // Update the report with the feedback
-      updateIncidentReport(id!, `${incident.investigation}\n\nActualización (${new Date().toLocaleTimeString()}): ${feedback}`);
+      updateIncidentReport(id!, `${incident.investigation}\n\nUpdate (${new Date().toLocaleTimeString()}): ${feedback}`);
       
       // Clear the feedback input
       setFeedback('');
@@ -61,8 +60,8 @@ const IncidentReview = () => {
     updateIncidentStatus(id!, 'done');
     
     toast({
-      title: "Reporte Completado",
-      description: "El reporte de incidente ha sido marcado como finalizado."
+      title: "Report Completed",
+      description: "The incident report has been marked as done."
     });
     
     navigate('/');
@@ -74,45 +73,45 @@ const IncidentReview = () => {
         <Button variant="outline" size="icon" onClick={() => navigate('/')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold">Revisión de Reporte de Incidente</h1>
+        <h1 className="text-2xl font-bold">Incident Report Review</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Incident Details */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Detalles del Incidente</h2>
+          <h2 className="text-xl font-semibold mb-4">Incident Details</h2>
           
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground">Fecha del Incidente</p>
+              <p className="text-sm text-muted-foreground">Date of Incident</p>
               <p className="font-medium">{formatDate(incident.date)}</p>
             </div>
             
             <div>
-              <p className="text-sm text-muted-foreground">Aerolínea</p>
+              <p className="text-sm text-muted-foreground">Airline</p>
               <p className="font-medium">{incident.airline}</p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Salida</p>
+                <p className="text-sm text-muted-foreground">Departure</p>
                 <p className="font-medium">{incident.departureAirport}</p>
               </div>
               
               <div>
-                <p className="text-sm text-muted-foreground">Llegada</p>
+                <p className="text-sm text-muted-foreground">Arrival</p>
                 <p className="font-medium">{incident.arrivingAirport}</p>
               </div>
             </div>
             
             <div>
-              <p className="text-sm text-muted-foreground">Descripción del Incidente</p>
+              <p className="text-sm text-muted-foreground">Incident Description</p>
               <p className="mt-1">{incident.incident}</p>
             </div>
 
             {incident.attachments.length > 0 && (
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Adjuntos</p>
+                <p className="text-sm text-muted-foreground mb-2">Attachments</p>
                 <div className="space-y-2">
                   {incident.attachments.map((attachment) => (
                     <div 
@@ -132,7 +131,7 @@ const IncidentReview = () => {
 
         {/* Middle Column - Report Content */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Reporte Generado</h2>
+          <h2 className="text-xl font-semibold mb-4">Generated Report</h2>
           <div className="prose prose-sm max-w-none">
             <p className="whitespace-pre-line">{incident.investigation}</p>
           </div>
@@ -140,12 +139,12 @@ const IncidentReview = () => {
 
         {/* Right Column - AI Chat */}
         <div className="bg-white rounded-lg shadow p-6 flex flex-col">
-          <h2 className="text-xl font-semibold mb-4">Asistente IA</h2>
+          <h2 className="text-xl font-semibold mb-4">AI Assistant</h2>
           
           <div className="flex-1 overflow-y-auto mb-4 space-y-4">
             {chatHistory.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <p>Pídale a la IA que le ayude a mejorar su reporte o hacer cambios en el contenido.</p>
+                <p>Ask the AI to help improve your report or make changes to the content.</p>
               </div>
             ) : (
               chatHistory.map((message, index) => (
@@ -169,7 +168,7 @@ const IncidentReview = () => {
             <Textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Escriba sus comentarios o preguntas aquí..."
+              placeholder="Type your feedback or questions here..."
               className="min-h-[80px] resize-none"
             />
             <Button 
@@ -187,7 +186,7 @@ const IncidentReview = () => {
             onClick={handleComplete}
           >
             <Check className="mr-2 h-4 w-4" />
-            Marcar como Finalizado
+            Mark as Done
           </Button>
         </div>
       </div>
@@ -196,7 +195,7 @@ const IncidentReview = () => {
       <Dialog open={!!showAttachment} onOpenChange={() => setShowAttachment(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Vista Previa del Adjunto</DialogTitle>
+            <DialogTitle>Attachment Preview</DialogTitle>
           </DialogHeader>
           {showAttachment && (
             showAttachment.includes('pdf') ? (
@@ -204,14 +203,14 @@ const IncidentReview = () => {
                 <iframe 
                   src={showAttachment} 
                   className="w-full h-full" 
-                  title="Vista previa de PDF"
+                  title="PDF Preview"
                 />
               </div>
             ) : (
               <div className="flex justify-center">
                 <img 
                   src={showAttachment} 
-                  alt="Adjunto" 
+                  alt="Attachment" 
                   className="max-h-[70vh] object-contain"
                 />
               </div>
