@@ -23,6 +23,7 @@ export interface Incident {
   baseIATA?: string;
   registration?: string;
   flightNumber?: string;
+  reportType?: 'quality' | 'safety';
 }
 
 export interface IncidentFormData {
@@ -37,4 +38,5 @@ export interface IncidentFormData {
   baseIATA: string;
   registration: string;
   flightNumber: string;
+  reportType?: 'quality' | 'safety';
 }

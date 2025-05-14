@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { ArrowLeft, Upload, X, File } from 'lucide-react';
+import { ArrowLeft, Upload, X, File, Download } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { IncidentFormData } from '@/types/incident';
 import { toast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const CreateIncident = () => {
   const { addIncident } = useIncidents();
@@ -29,7 +30,8 @@ const CreateIncident = () => {
       eventNumber: '',
       baseIATA: '',
       registration: '',
-      flightNumber: ''
+      flightNumber: '',
+      reportType: 'quality'
     }
   });
 
@@ -83,18 +85,55 @@ const CreateIncident = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col space-y-6 max-w-3xl mx-auto">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="icon" onClick={handleBack}>
-            <ArrowLeft className="h-4 w-4" />
+    <div className="bg-slate-50 min-h-screen">
+      <div className="container mx-auto py-4 px-4">
+        <div className="flex items-center space-x-3 mb-6">
+          <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full">
+            <ArrowLeft className="h-4 w-4 text-indigo-600" />
           </Button>
-          <h1 className="text-3xl font-bold">Crear Nuevo Reporte de Incidente</h1>
+          <h1 className="text-2xl font-bold text-indigo-700">Crear Nuevo Reporte de Incidente</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {/* Tipo de Reporte */}
+              <div className="bg-sky-50 rounded-lg p-5 border border-sky-100">
+                <h2 className="font-medium text-lg mb-4 text-indigo-800">Tipo de Reporte</h2>
+                <FormField
+                  control={form.control}
+                  name="reportType"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="quality" id="quality" />
+                            <div>
+                              <Label htmlFor="quality" className="font-medium">Calidad</Label>
+                              <p className="text-sm text-slate-500">Reporte de incidente de calidad</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="safety" id="safety" />
+                            <div>
+                              <Label htmlFor="safety" className="font-medium">Seguridad Operacional</Label>
+                              <p className="text-sm text-slate-500">Reporte de seguridad operacional</p>
+                            </div>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Información básica */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -103,7 +142,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Fecha del Incidente</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input type="date" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -117,7 +156,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Número de Evento</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ingrese número de evento" {...field} />
+                        <Input placeholder="Ingrese número de evento" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -131,7 +170,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Aerolínea</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ingrese nombre de aerolínea" {...field} />
+                        <Input placeholder="Ingrese nombre de aerolínea" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -145,7 +184,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Base (siglas IATA)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ej. BOG, MEX, LIM" {...field} />
+                        <Input placeholder="Ej. BOG, MEX, LIM" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -159,7 +198,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Matrícula</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ingrese matrícula de la aeronave" {...field} />
+                        <Input placeholder="Ingrese matrícula de la aeronave" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -173,7 +212,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Número de Vuelo</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ej. LA2456" {...field} />
+                        <Input placeholder="Ej. LA2456" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -187,7 +226,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Aeropuerto de Salida</FormLabel>
                       <FormControl>
-                        <Input placeholder="Código de aeropuerto (ej. JFK)" {...field} />
+                        <Input placeholder="Código de aeropuerto (ej. JFK)" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -201,7 +240,7 @@ const CreateIncident = () => {
                     <FormItem>
                       <FormLabel>Aeropuerto de Llegada</FormLabel>
                       <FormControl>
-                        <Input placeholder="Código de aeropuerto (ej. LAX)" {...field} />
+                        <Input placeholder="Código de aeropuerto (ej. LAX)" {...field} className="border-slate-300" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -209,16 +248,22 @@ const CreateIncident = () => {
                 />
               </div>
 
+              {/* Causas Raíces */}
               <FormField
                 control={form.control}
                 name="incident"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descripción del Incidente</FormLabel>
+                    <FormLabel>Causas Raíces</FormLabel>
+                    <p className="text-sm text-slate-500 mb-2">
+                      Edite el siguiente listado de causas potenciales seleccionando las que apliquen al evento
+                    </p>
                     <FormControl>
                       <Textarea 
-                        placeholder="Proporcione una descripción detallada del incidente" 
-                        className="min-h-[100px]" 
+                        placeholder="Factor Humano: Error de juicio, Falta de comunicación, Fatiga
+Factor Técnico: Falla de equipo, Mantenimiento inadecuado, Diseño deficiente
+Factor Organizacional: Procedimiento inadecuado, Presión operacional, Cultura de seguridad" 
+                        className="min-h-[120px] border-slate-300" 
                         {...field} 
                       />
                     </FormControl>
@@ -227,6 +272,19 @@ const CreateIncident = () => {
                 )}
               />
 
+              {/* Novedad */}
+              <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                <h2 className="font-medium text-indigo-800 mb-3">Novedad</h2>
+                <Textarea 
+                  placeholder="Registra el incidente informado por el cliente"
+                  className="min-h-[100px] border-slate-300"
+                  onChange={(e) => {
+                    // This is just for the UI, not affecting the form data
+                  }}
+                />
+              </div>
+
+              {/* Notas de Investigación */}
               <FormField
                 control={form.control}
                 name="investigation"
@@ -235,8 +293,8 @@ const CreateIncident = () => {
                     <FormLabel>Notas de Investigación</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Ingrese hallazgos iniciales de la investigación" 
-                        className="min-h-[150px]" 
+                        placeholder="Ingrese la información recolectada y el análisis realizado. Sé detallado para mejorar trazabilidad y calidad" 
+                        className="min-h-[150px] border-slate-300" 
                         {...field} 
                       />
                     </FormControl>
@@ -245,14 +303,15 @@ const CreateIncident = () => {
                 )}
               />
 
-              <div className="space-y-4">
-                <Label>Adjuntos (Imágenes, PDFs, Documentos)</Label>
+              {/* Adjuntos */}
+              <div className="bg-sky-50 p-5 rounded-lg border border-sky-100">
+                <h2 className="font-medium text-indigo-800 mb-3">Adjuntos (Imágenes, PDFs, Documentos)</h2>
                 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 mb-4">
                   <Button
                     type="button"
                     variant="outline"
-                    className="relative"
+                    className="relative border-indigo-500 text-indigo-600 hover:bg-indigo-50"
                     onClick={() => document.getElementById('file-upload')?.click()}
                   >
                     <Upload className="mr-2 h-4 w-4" />
@@ -266,19 +325,19 @@ const CreateIncident = () => {
                       accept="image/*,application/pdf,.doc,.docx"
                     />
                   </Button>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-slate-500">
                     Formatos soportados: Imágenes, PDFs, documentos Word
                   </p>
                 </div>
 
                 {files.length > 0 && (
-                  <div className="border rounded-md p-4">
+                  <div className="border rounded-md p-4 bg-white">
                     <p className="text-sm font-medium mb-2">Archivos Adjuntos ({files.length})</p>
                     <div className="space-y-2">
                       {files.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
+                        <div key={index} className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
                           <div className="flex items-center">
-                            <File className="h-4 w-4 mr-2" />
+                            <File className="h-4 w-4 mr-2 text-indigo-500" />
                             <span className="text-sm truncate max-w-xs">{file.name}</span>
                           </div>
                           <Button 
@@ -286,6 +345,7 @@ const CreateIncident = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => removeFile(index)}
+                            className="text-slate-400 hover:text-red-500"
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -297,10 +357,18 @@ const CreateIncident = () => {
               </div>
 
               <div className="flex justify-between pt-4">
-                <Button type="button" variant="outline" onClick={handleBack}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleBack}
+                  className="border-slate-300"
+                >
                   Volver
                 </Button>
-                <Button type="submit">
+                <Button 
+                  type="submit"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
                   Proceder a Revisión
                 </Button>
               </div>
