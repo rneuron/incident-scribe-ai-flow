@@ -24,6 +24,7 @@ export interface Incident {
   registration?: string;
   flightNumber?: string;
   reportType?: 'quality' | 'safety';
+  selectedManuals?: string[];
 }
 
 export interface IncidentFormData {
@@ -39,4 +40,5 @@ export interface IncidentFormData {
   registration: string;
   flightNumber: string;
   reportType?: 'quality' | 'safety';
+  selectedManuals?: string[];
 }

@@ -1,17 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Calendar, Plane, MapPin, FileText, Pencil } from 'lucide-react';
+import { Plus, Calendar, Plane, MapPin, FileText, Pencil, Search, Trash2 } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { IncidentStatus } from '@/types/incident';
 import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
 
 const IncidentList = () => {
-  const { incidents, updateIncidentStatus } = useIncidents();
+  const { incidents, updateIncidentStatus, deleteIncident } = useIncidents();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleCreateNew = () => {
     navigate('/create-incident');
@@ -19,6 +21,10 @@ const IncidentList = () => {
 
   const handleStatusChange = (id: string, status: IncidentStatus) => {
     updateIncidentStatus(id, status);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteIncident(id);
   };
 
   const formatDate = (dateString: string) => {
@@ -39,15 +45,13 @@ const IncidentList = () => {
     }
   };
 
-  const getStatusLabel = (status: IncidentStatus): string => {
-    switch (status) {
-      case 'draft': return 'Borrador';
-      case 'preliminary': return 'Preliminar';
-      case 'done': return 'Completado';
-      case 'sent to client': return 'Enviado al Cliente';
-      default: return status;
-    }
-  };
+  const filteredIncidents = incidents.filter(incident =>
+    incident.airline.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.incident.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.departureAirport.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.arrivingAirport.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.eventNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-6">
@@ -64,6 +68,18 @@ const IncidentList = () => {
           </Button>
         </div>
 
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input 
+              placeholder="Buscar incidentes por aerolínea, aeropuerto, número de evento..." 
+              className="pl-10 pr-4 py-2 border-slate-200"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
           <Table>
             <TableHeader className="bg-slate-50">
@@ -78,14 +94,14 @@ const IncidentList = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {incidents.length === 0 ? (
+              {filteredIncidents.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-12 text-slate-500">
                     No se encontraron incidentes. Cree su primer reporte de incidente.
                   </TableCell>
                 </TableRow>
               ) : (
-                incidents.map((incident) => (
+                filteredIncidents.map((incident) => (
                   <TableRow key={incident.id} className="hover:bg-slate-50">
                     <TableCell className="font-medium">{formatDate(incident.date)}</TableCell>
                     <TableCell>{incident.airline}</TableCell>
@@ -117,15 +133,25 @@ const IncidentList = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => navigate(`/review-incident/${incident.id}`)}
-                        className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                      >
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Editar Reporte
-                      </Button>
+                      <div className="flex justify-end space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => navigate(`/review-incident/${incident.id}`)}
+                          className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Editar Reporte
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDelete(incident.id)}
+                          className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

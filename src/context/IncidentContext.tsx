@@ -8,6 +8,7 @@ interface IncidentContextType {
   updateIncidentStatus: (id: string, status: IncidentStatus) => void;
   getIncidentById: (id: string) => Incident | undefined;
   updateIncidentReport: (id: string, report: string) => void;
+  deleteIncident: (id: string) => void;
 }
 
 const IncidentContext = createContext<IncidentContextType | undefined>(undefined);
@@ -38,7 +39,8 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
       eventNumber: 'EV-2025-042',
       baseIATA: 'JFK',
       registration: 'N12345',
-      flightNumber: 'AE789'
+      flightNumber: 'AE789',
+      selectedManuals: ['manual4']
     },
     {
       id: '2',
@@ -54,7 +56,8 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
       eventNumber: 'EV-2025-041',
       baseIATA: 'ATL',
       registration: 'N54321',
-      flightNumber: 'SE456'
+      flightNumber: 'SE456',
+      selectedManuals: ['manual2', 'manual5']
     },
     {
       id: '3',
@@ -72,7 +75,8 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
       eventNumber: 'EV-2025-040',
       baseIATA: 'SFO',
       registration: 'N98765',
-      flightNumber: 'GA123'
+      flightNumber: 'GA123',
+      selectedManuals: ['manual1']
     }
   ]);
 
@@ -126,6 +130,10 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const deleteIncident = (id: string) => {
+    setIncidents(prev => prev.filter(incident => incident.id !== id));
+  };
+
   return (
     <IncidentContext.Provider 
       value={{ 
@@ -133,7 +141,8 @@ export const IncidentProvider = ({ children }: { children: ReactNode }) => {
         addIncident, 
         updateIncidentStatus, 
         getIncidentById,
-        updateIncidentReport
+        updateIncidentReport,
+        deleteIncident
       }}
     >
       {children}
