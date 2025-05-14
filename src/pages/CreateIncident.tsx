@@ -99,9 +99,6 @@ const CreateIncident = () => {
               {/* Tipo de Reporte */}
               <ReportTypeSelector control={form.control} />
               
-              {/* Selección de Manuales */}
-              <ManualSelectionSection control={form.control} />
-
               {/* Información básica */}
               <IncidentDetailsForm 
                 control={form.control}
@@ -111,6 +108,9 @@ const CreateIncident = () => {
 
               {/* Causas Raíces, Novedad y Notas de Investigación */}
               <CauseAnalysisForm control={form.control} />
+              
+              {/* Selección de Manuales - Moved to the end */}
+              <ManualSelectionSection control={form.control} />
 
               <div className="flex justify-between pt-4">
                 <Button 

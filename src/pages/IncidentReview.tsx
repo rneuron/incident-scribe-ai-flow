@@ -5,12 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Download, Send, Check, Paperclip, Info, FileText } from 'lucide-react';
+import { ArrowLeft, Download, Send, Check, Paperclip, Info, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { useIncidents } from '@/context/IncidentContext';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { IncidentStatus } from '@/types/incident';
 import { Card, CardContent } from '@/components/ui/card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const IncidentReview = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,12 +25,16 @@ const IncidentReview = () => {
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'ai'; content: string; timestamp?: string }[]>([
     {
       role: 'ai',
-      content: `He generado un reporte inicial basado en la información proporcionada. Se utilizó como referencia el **Manual de Control de Calidad (QCM)**, Sección 4.3 - "Procedimiento de investigación de incidentes".\n\nA continuación, el reporte generado para el evento ${incident?.eventNumber || 'EV-2025-042'}:`,
+      content: `He generado un reporte inicial basado en la información proporcionada. Se utilizó como referencia el **${getManualName(incident?.selectedManuals?.[0] || 'manual4')}**, Sección 4.3 - "Procedimiento de investigación de incidentes".\n\nA continuación, el reporte generado para el evento ${incident?.eventNumber || 'EV-2025-042'}:`,
       timestamp: new Date().toISOString()
     }
   ]);
   const [showAttachment, setShowAttachment] = useState<string | null>(null);
   const [statusValue, setStatusValue] = useState<IncidentStatus>(incident?.status || 'draft');
+  const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({
+    incident: false,
+    investigation: false
+  });
 
   if (!incident) {
     return (
@@ -43,12 +50,30 @@ const IncidentReview = () => {
     );
   }
 
+  function getManualName(manualId: string): string {
+    const manuals: {[key: string]: string} = {
+      'manual1': 'Manual de Operaciones (MO)',
+      'manual2': 'Manual General de Mantenimiento (MGM)',
+      'manual3': 'Manual de Vuelo de la Aeronave (AFM)',
+      'manual4': 'Manual de Control de Calidad (QCM)',
+      'manual5': 'Manual de Operaciones de Tierra (GOM)',
+    };
+    return manuals[manualId] || 'Manual de Control de Calidad (QCM)';
+  }
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), 'd MMMM yyyy');
     } catch (error) {
       return dateString;
     }
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
   };
 
   const handleSendFeedback = () => {
@@ -63,7 +88,14 @@ const IncidentReview = () => {
     
     // Simulate AI response
     setTimeout(() => {
-      const aiResponse = `He actualizado el reporte según su solicitud: "${feedback}".\n\nSe tomó como referencia el Manual de Control de Calidad (QCM), sección 4.3.2 - "Actualización de reportes basados en nueva información".`;
+      // Determine which manual to reference
+      const manualId = incident.selectedManuals && incident.selectedManuals.length > 0 
+        ? incident.selectedManuals[0] 
+        : 'manual4';
+      
+      const manualName = getManualName(manualId);
+      
+      const aiResponse = `He actualizado el reporte según su solicitud: "${feedback}".\n\nSe tomó como referencia el ${manualName}, sección 4.3.2 - "Actualización de reportes basados en nueva información".`;
       setChatHistory(prev => [...prev, { 
         role: 'ai', 
         content: aiResponse,
@@ -109,106 +141,149 @@ const IncidentReview = () => {
           <h1 className="text-2xl font-bold text-indigo-700">Revisión de Reporte de Incidente</h1>
         </div>
 
-        {/* Incident Details Card - Horizontal */}
+        {/* Incident Details Card - Horizontal with improved information display */}
         <div className="mb-6">
           <Card className="bg-gray-100 border border-gray-200">
             <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-indigo-700 mb-4">
-                    Detalles del Incidente
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-sm text-slate-500 mb-1">Número de Evento</p>
-                      <p className="font-medium text-slate-800">{incident.eventNumber || 'EV-2025-042'}</p>
-                      
-                      <p className="text-sm text-slate-500 mb-1 mt-4">Fecha del Incidente</p>
-                      <p className="font-medium text-slate-800">{formatDate(incident.date)}</p>
-                      
-                      <p className="text-sm text-slate-500 mb-1 mt-4">Tipo de Reporte</p>
-                      <p className="font-medium text-slate-800 inline-flex items-center">
-                        <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                        {incident.reportType === 'safety' ? 'Seguridad Operacional' : 'Calidad'}
-                      </p>
-                    </div>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold text-indigo-700 mb-4">
+                      Detalles del Incidente
+                    </h2>
                     
-                    <div>
-                      <p className="text-sm text-slate-500 mb-1">Aerolínea</p>
-                      <p className="font-medium text-slate-800">{incident.airline}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-slate-500 mb-1">Número de Evento</p>
+                        <p className="font-medium text-slate-800">{incident.eventNumber || 'EV-2025-042'}</p>
+                        
+                        <p className="text-sm text-slate-500 mb-1 mt-4">Fecha del Incidente</p>
+                        <p className="font-medium text-slate-800">{formatDate(incident.date)}</p>
+                        
+                        <p className="text-sm text-slate-500 mb-1 mt-4">Tipo de Reporte</p>
+                        <p className="font-medium text-slate-800 inline-flex items-center">
+                          <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                          {incident.reportType === 'safety' ? 'Seguridad Operacional' : 'Calidad'}
+                        </p>
+                      </div>
                       
-                      <p className="text-sm text-slate-500 mb-1 mt-4">Base IATA</p>
-                      <p className="font-medium text-slate-800">{incident.baseIATA || 'JFK'}</p>
+                      <div>
+                        <p className="text-sm text-slate-500 mb-1">Aerolínea</p>
+                        <p className="font-medium text-slate-800">{incident.airline}</p>
+                        
+                        <p className="text-sm text-slate-500 mb-1 mt-4">Base IATA</p>
+                        <p className="font-medium text-slate-800">{incident.baseIATA || 'JFK'}</p>
+                        
+                        <p className="text-sm text-slate-500 mb-1 mt-4">Matrícula</p>
+                        <p className="font-medium text-slate-800">{incident.registration || 'N12345'}</p>
+                        
+                        <p className="text-sm text-slate-500 mb-1 mt-4">Número de Vuelo</p>
+                        <p className="font-medium text-slate-800">{incident.flightNumber || 'AE789'}</p>
+                      </div>
                       
-                      <p className="text-sm text-slate-500 mb-1 mt-4">Matrícula</p>
-                      <p className="font-medium text-slate-800">{incident.registration || 'N12345'}</p>
-                      
-                      <p className="text-sm text-slate-500 mb-1 mt-4">Número de Vuelo</p>
-                      <p className="font-medium text-slate-800">{incident.flightNumber || 'AE789'}</p>
-                    </div>
-                    
-                    <div>
-                      <div className="flex items-start space-x-4">
-                        <div>
-                          <p className="text-sm text-slate-500 mb-1">Salida</p>
-                          <p className="font-medium text-slate-800">{incident.departureAirport}</p>
+                      <div>
+                        <div className="flex items-start space-x-4 mb-4">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="border border-slate-200 rounded-md bg-white p-3">
+                                  <p className="text-sm text-slate-500 mb-1">Ruta</p>
+                                  <div className="flex items-center">
+                                    <div className="text-center">
+                                      <p className="font-medium text-slate-800">{incident.departureAirport || 'BOG'}</p>
+                                      <p className="text-xs text-slate-500">Salida</p>
+                                    </div>
+                                    <div className="mx-2 text-slate-400">→</div>
+                                    <div className="text-center">
+                                      <p className="font-medium text-slate-800">{incident.arrivingAirport || 'MDE'}</p>
+                                      <p className="text-xs text-slate-500">Llegada</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Ruta del vuelo {incident.flightNumber}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                         
-                        <div>
-                          <p className="text-sm text-slate-500 mb-1">Llegada</p>
-                          <p className="font-medium text-slate-800">{incident.arrivingAirport}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-4">
-                        <p className="text-sm text-slate-500 mb-1">Descripción de la Novedad</p>
-                        <p className="mt-1 text-slate-700 text-sm">{incident.incident}</p>
-                      </div>
-                      
-                      {incident.selectedManuals && incident.selectedManuals.length > 0 && (
-                        <div className="mt-4">
-                          <p className="text-sm text-slate-500 mb-1 flex items-center">
-                            <FileText className="h-4 w-4 mr-1" />
-                            Manuales de Referencia
-                          </p>
-                          <div className="flex flex-wrap gap-2 mt-1">
-                            {incident.selectedManuals.map((manualId) => (
-                              <span key={manualId} className="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">
-                                {manualId === 'manual1' ? 'Manual de Operaciones (MO)' :
-                                 manualId === 'manual2' ? 'Manual General de Mantenimiento (MGM)' :
-                                 manualId === 'manual3' ? 'Manual de Vuelo de la Aeronave (AFM)' :
-                                 manualId === 'manual4' ? 'Manual de Control de Calidad (QCM)' :
-                                 'Manual de Operaciones de Tierra (GOM)'}
-                              </span>
-                            ))}
+                        {incident.selectedManuals && incident.selectedManuals.length > 0 && (
+                          <div className="mt-4">
+                            <p className="text-sm text-slate-500 mb-1 flex items-center">
+                              <FileText className="h-4 w-4 mr-1" />
+                              Manuales de Referencia
+                            </p>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                              {incident.selectedManuals.map((manualId) => (
+                                <span key={manualId} className="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">
+                                  {getManualName(manualId)}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                {incident.attachments.length > 0 && (
-                  <div className="w-full md:w-64">
-                    <p className="text-sm text-slate-500 mb-2 flex items-center">
-                      <Paperclip className="h-4 w-4 mr-1" />
-                      Adjuntos ({incident.attachments.length})
-                    </p>
-                    <div className="space-y-2">
-                      {incident.attachments.map((attachment) => (
-                        <div 
-                          key={attachment.id} 
-                          className="flex items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-slate-50 border border-slate-200 transition-colors"
-                          onClick={() => setShowAttachment(attachment.url)}
-                        >
-                          <Paperclip className="h-4 w-4 mr-2 text-indigo-500" />
-                          <span className="text-sm text-slate-700 truncate">{attachment.name}</span>
-                        </div>
-                      ))}
+                {/* Expandable/Collapsible Sections for longer content */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  {/* Novedad Section */}
+                  <div className="bg-white rounded-lg border border-slate-200 p-4">
+                    <div 
+                      className="flex justify-between items-center cursor-pointer"
+                      onClick={() => toggleSection('incident')}
+                    >
+                      <h3 className="font-medium text-indigo-700">Descripción de la Novedad</h3>
+                      {expandedSections.incident ? (
+                        <ChevronUp className="h-4 w-4 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-slate-500" />
+                      )}
                     </div>
+                    
+                    <div className={`mt-2 text-sm text-slate-700 ${expandedSections.incident ? '' : 'line-clamp-2'}`}>
+                      {incident.incident || 
+                        "Factor Humano: Error de juicio, Falta de comunicación, Fatiga\n" +
+                        "Factor Técnico: Falla de equipo, Mantenimiento inadecuado, Diseño deficiente\n" +
+                        "Factor Organizacional: Procedimiento inadecuado, Presión operacional, Cultura de seguridad"
+                      }
+                    </div>
+                    
+                    {!expandedSections.incident && incident.incident && incident.incident.length > 100 && (
+                      <div className="text-xs text-indigo-600 mt-1 cursor-pointer" onClick={() => toggleSection('incident')}>
+                        Ver más...
+                      </div>
+                    )}
                   </div>
-                )}
+                  
+                  {/* Notas de Investigación Section */}
+                  <div className="bg-white rounded-lg border border-slate-200 p-4">
+                    <div 
+                      className="flex justify-between items-center cursor-pointer"
+                      onClick={() => toggleSection('investigation')}
+                    >
+                      <h3 className="font-medium text-indigo-700">Notas de Investigación</h3>
+                      {expandedSections.investigation ? (
+                        <ChevronUp className="h-4 w-4 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-slate-500" />
+                      )}
+                    </div>
+                    
+                    <div className={`mt-2 text-sm text-slate-700 ${expandedSections.investigation ? '' : 'line-clamp-2'}`}>
+                      {incident.investigation || "No hay notas de investigación disponibles."}
+                    </div>
+                    
+                    {!expandedSections.investigation && incident.investigation && incident.investigation.length > 100 && (
+                      <div className="text-xs text-indigo-600 mt-1 cursor-pointer" onClick={() => toggleSection('investigation')}>
+                        Ver más...
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

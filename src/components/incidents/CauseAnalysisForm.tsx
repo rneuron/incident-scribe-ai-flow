@@ -11,7 +11,7 @@ interface CauseAnalysisFormProps {
 
 const CauseAnalysisForm: React.FC<CauseAnalysisFormProps> = ({ control }) => {
   return (
-    <>
+    <div className="space-y-6">
       {/* Causas Raíces */}
       <FormField
         control={control}
@@ -36,14 +36,27 @@ Factor Organizacional: Procedimiento inadecuado, Presión operacional, Cultura d
         )}
       />
 
-      {/* Novedad */}
-      <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
-        <h2 className="font-medium text-indigo-800 mb-3">Novedad</h2>
-        <Textarea 
-          placeholder="Registra el incidente informado por el cliente"
-          className="min-h-[100px] border-slate-300"
-        />
-      </div>
+      {/* Novedad - Using same styling as other form fields */}
+      <FormField
+        control={control}
+        name="incident"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Novedad</FormLabel>
+            <p className="text-sm text-slate-500 mb-2">
+              Registra el incidente informado por el cliente
+            </p>
+            <FormControl>
+              <Textarea 
+                placeholder="Describa la novedad reportada por el cliente"
+                className="min-h-[100px] border-slate-300"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       {/* Notas de Investigación */}
       <FormField
@@ -52,9 +65,12 @@ Factor Organizacional: Procedimiento inadecuado, Presión operacional, Cultura d
         render={({ field }) => (
           <FormItem>
             <FormLabel>Notas de Investigación</FormLabel>
+            <p className="text-sm text-slate-500 mb-2">
+              Ingrese la información recolectada y el análisis realizado
+            </p>
             <FormControl>
               <Textarea 
-                placeholder="Ingrese la información recolectada y el análisis realizado. Sé detallado para mejorar trazabilidad y calidad" 
+                placeholder="Sé detallado para mejorar trazabilidad y calidad del análisis" 
                 className="min-h-[150px] border-slate-300" 
                 {...field} 
               />
@@ -63,7 +79,7 @@ Factor Organizacional: Procedimiento inadecuado, Presión operacional, Cultura d
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 };
 
